@@ -186,8 +186,6 @@ class Main extends AbstractVRApplication {
             cube.rotation.z += cube.userData.velocity.z * 2 * delta;
 
         }
-
-        this.controls.update();
         this.effect.render(this.scene, this.camera);
 
     }

@@ -1,30 +1,41 @@
 import * as THREE from 'three'
+import ColladaLoader from 'three-collada-loader'
 import AbstractApplication from 'views/AbstractApplication'
 import shaderVert from 'shaders/custom.vert'
 import shaderFrag from 'shaders/custom.frag'
 
-class Main extends AbstractApplication {
-    constructor(){
+class Main extends AbstractApplication{
+  constructor(){
+    super();
+    var loader = new ColladaLoader();
+    var self = this;
+    loader.load( 'assets/models/MNP_Towers.dae', function ( collada ) {
+      var animations = collada.animations;
+      var avatar = collada.scene;
+      self.scene.add(avatar);
+    });
+    var ambientLight = new THREE.AmbientLight( 0xffffff, 0.2 );
+    this.scene.add( ambientLight );
+    var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
+    directionalLight.position.set( 1, 1, - 1 );
+    this.scene.add( directionalLight );
+    this.animate()
+  }
 
-        super();
+  animate() {
+    this.effect.requestAnimationFrame( this.animate.bind(this) );
+    this.render();
+  }
 
-        var texture = new THREE.TextureLoader().load( 'assets/textures/crate.gif' );
+  onWindowResize() {
+    super.onWindowResize();
+    this.effect.setSize( window.innerWidth, window.innerHeight );
+  }
 
-        var geometry = new THREE.BoxGeometry( 200, 200, 200 );
-        var material = new THREE.MeshBasicMaterial( { map: texture } );
-
-        var material2 = new THREE.ShaderMaterial({
-            vertexShader: shaderVert,
-            fragmentShader: shaderFrag
-        });
-
-        this._mesh = new THREE.Mesh( geometry, material2 );
-        this._scene.add( this._mesh );
-
-        this.animate();
-
-    }
-
+  render() {
+    this.controls.update();
+    this.effect.render(this.scene, this.camera);
+  }
 }
 
 export default Main;
